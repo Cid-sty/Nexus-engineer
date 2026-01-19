@@ -1,0 +1,8 @@
+{
+  "name": "Nexus Engineer - High Performance Growth Platform",
+  "description": "A focused platform for tier-2 and tier-3 engineering students to find serious peers, build hackathon squads, and track technical growth via AI-driven mindset matching.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
