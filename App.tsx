@@ -1,13 +1,13 @@
-
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import AICompanion from './components/AICompanion';
 import SquadBuilder from './components/SquadBuilder';
 import RewardsHub from './components/RewardsHub';
+import GrowthAnalytics from './components/GrowthAnalytics';
 import { INITIAL_USER } from './constants';
 import { ViewType } from './types';
-import { Search, Bell, Settings, TrendingUp, BookCheck, ShieldCheck } from 'lucide-react';
+import { Search, Bell, Settings, BookCheck, ShieldCheck } from 'lucide-react';
 
 const LearningPathPlaceholder = () => (
   <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
@@ -34,20 +34,6 @@ const LearningPathPlaceholder = () => (
   </div>
 );
 
-const AnalyticsPlaceholder = () => (
-  <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-     <h2 className="text-3xl font-bold text-white flex items-center gap-3">Growth Analytics <TrendingUp className="text-indigo-400" /></h2>
-     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-zinc-900/40 border border-zinc-800 p-8 rounded-2xl h-80 flex items-center justify-center">
-          <p className="text-zinc-500 italic">Consistency Heatmap Visualizer Rendering...</p>
-        </div>
-        <div className="bg-zinc-900/40 border border-zinc-800 p-8 rounded-2xl h-80 flex items-center justify-center">
-          <p className="text-zinc-500 italic">Skill Distribution Radar Chart Rendering...</p>
-        </div>
-     </div>
-  </div>
-);
-
 const App: React.FC = () => {
   const [currentView, setView] = useState<ViewType>('dashboard');
   const [user] = useState(INITIAL_USER);
@@ -65,7 +51,7 @@ const App: React.FC = () => {
       case 'learning':
         return <LearningPathPlaceholder />;
       case 'analytics':
-        return <AnalyticsPlaceholder />;
+        return <GrowthAnalytics user={user} />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-[70vh] text-zinc-500 space-y-4">
@@ -104,7 +90,7 @@ const App: React.FC = () => {
             <div className="flex items-center gap-3 bg-zinc-900/50 px-3 py-1.5 rounded-xl border border-zinc-800">
               <div className="text-right">
                 <p className="text-xs font-bold text-white">{user.name}</p>
-                <p className="text-[10px] text-zinc-500">Non-elite College Student</p>
+                <p className="text-[10px] text-zinc-500">Tier-2 Growth Focus</p>
               </div>
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
                 {user.name[0]}

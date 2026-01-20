@@ -1,7 +1,14 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile } from "./types";
 
+const cleanJsonResponse = (text: string) => {
+  // Removes potential markdown code blocks like ```json ... ```
+  return text.replace(/```json/g, '').replace(/```/g, '').trim();
+};
+
+/**
+ * Generates personalized growth recommendations based on the user's engineering profile.
+ */
 export const getAIRecommendation = async (user: UserProfile) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Based on this engineering student profile:
@@ -17,7 +24,7 @@ export const getAIRecommendation = async (user: UserProfile) => {
   3. A short encouragement for their current streak of ${user.streak} days.
   4. One internship preparation tip.
   
-  Format as JSON.`;
+  Format as valid JSON.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -37,18 +44,24 @@ export const getAIRecommendation = async (user: UserProfile) => {
         }
       }
     });
-    return JSON.parse(response.text || '{}');
+    
+    const text = cleanJsonResponse(response.text || '');
+    if (!text) throw new Error("Empty response from AI");
+    return JSON.parse(text);
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Gemini Recommendation Error:", error);
     return {
       nextSkill: "Advanced System Design",
       hackathonTheme: "AI for Social Good",
-      encouragement: "Stay consistent, your growth is measurable.",
-      internshipTip: "Focus on your GitHub portfolio projects."
+      encouragement: "Consistency is your greatest leverage. Keep pushing.",
+      internshipTip: "Focus on refining your GitHub READMEs for core projects."
     };
   }
 };
 
+/**
+ * Handles conversational queries from the user via the Nexus Intelligence companion.
+ */
 export const getChatResponse = async (history: any[], message: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const chat = ai.chats.create({
@@ -58,10 +71,18 @@ export const getChatResponse = async (history: any[], message: string) => {
     }
   });
 
-  const response = await chat.sendMessage({ message });
-  return response.text;
+  try {
+    const response = await chat.sendMessage({ message });
+    return response.text || "I'm having trouble processing that request right now.";
+  } catch (error) {
+    console.error("Gemini Chat Error:", error);
+    return "The Nexus connection is unstable. Please check your configuration and try again.";
+  }
 };
 
+/**
+ * Suggests compatible teammates for hackathons based on technical skills and mindset.
+ */
 export const suggestSquads = async (user: UserProfile) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Form 3 hypothetical high-compatibility teammates for ${user.name} for a major engineering hackathon.
@@ -70,7 +91,7 @@ export const suggestSquads = async (user: UserProfile) => {
   Note: Teammates should also be from non-elite colleges to ensure similar mindset and hustle.
   
   Explain WHY each teammate is a good mindset match.
-  Return JSON array of objects with fields: name, role, matchingReason, skills.`;
+  Return JSON array of objects with fields: name, role, matchingReason, skills, location.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -86,16 +107,42 @@ export const suggestSquads = async (user: UserProfile) => {
               name: { type: Type.STRING },
               role: { type: Type.STRING },
               matchingReason: { type: Type.STRING },
-              skills: { type: Type.ARRAY, items: { type: Type.STRING } }
+              skills: { type: Type.ARRAY, items: { type: Type.STRING } },
+              location: { type: Type.STRING }
             },
-            required: ["name", "role", "matchingReason", "skills"]
+            required: ["name", "role", "matchingReason", "skills", "location"]
           }
         }
       }
     });
-    return JSON.parse(response.text || '[]');
+    
+    const text = cleanJsonResponse(response.text || '');
+    if (!text) return [];
+    return JSON.parse(text);
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return [];
+    console.error("Gemini Squad Suggestion Error:", error);
+    return [
+      {
+        name: "Vikram R.",
+        role: "Backend Engineer",
+        matchingReason: "Shares your focus on high-performance Node.js systems and consistent daily coding habit.",
+        skills: ["Node.js", "Redis", "PostgreSQL"],
+        location: "Pune, Maharashtra"
+      },
+      {
+        name: "Ishita S.",
+        role: "UI/UX Designer",
+        matchingReason: "Passionate about bridging technical complexity with intuitive user interfaces for non-elite college platforms.",
+        skills: ["Figma", "React", "Tailwind"],
+        location: "Lucknow, UP"
+      },
+      {
+        name: "Rahul K.",
+        role: "DevOps specialist",
+        matchingReason: "Focuses on automation and scale, complementing your frontend-heavy skill set with structural integrity.",
+        skills: ["Kubernetes", "AWS", "CI/CD"],
+        location: "Indore, MP"
+      }
+    ];
   }
 };
