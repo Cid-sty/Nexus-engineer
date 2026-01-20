@@ -6,7 +6,7 @@ export const getAIRecommendation = async (user: UserProfile) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Based on this engineering student profile:
   Name: ${user.name}
-  College Tier: 2/3
+  College: Non-elite
   Skills: ${user.skills.map(s => `${s.name} (${s.level}%)`).join(', ')}
   Commitment: ${user.commitmentHours} hrs/week
   Goal: ${user.primaryGoal}
@@ -54,7 +54,7 @@ export const getChatResponse = async (history: any[], message: string) => {
   const chat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: "You are 'Nexus AI', a growth companion for tier-2/3 engineering students. You are focused, professional, and slightly rigorous. You encourage discipline, consistency, and hard work. No small talk. Focus on roadmaps, hackathons, and internship prep."
+      systemInstruction: "You are 'Nexus AI', a growth companion for engineering students from non-elite colleges. You are focused, professional, and slightly rigorous. You encourage discipline, consistency, and hard work. No small talk. Focus on roadmaps, hackathons, and internship prep."
     }
   });
 
@@ -67,6 +67,7 @@ export const suggestSquads = async (user: UserProfile) => {
   const prompt = `Form 3 hypothetical high-compatibility teammates for ${user.name} for a major engineering hackathon.
   User Skills: ${user.skills.map(s => s.name).join(', ')}
   Goal: ${user.primaryGoal}
+  Note: Teammates should also be from non-elite colleges to ensure similar mindset and hustle.
   
   Explain WHY each teammate is a good mindset match.
   Return JSON array of objects with fields: name, role, matchingReason, skills.`;

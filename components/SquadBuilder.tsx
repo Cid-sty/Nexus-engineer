@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { suggestSquads } from '../geminiService';
-import { Users, Filter, Sparkles, MapPin, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Filter, Sparkles, MapPin, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface SquadBuilderProps {
   user: UserProfile;
@@ -57,7 +57,7 @@ const SquadBuilder: React.FC<SquadBuilderProps> = ({ user }) => {
                 </span>
               </div>
               <h4 className="text-xl font-bold text-white mb-1">{rec.name}</h4>
-              <p className="text-xs text-zinc-500 flex items-center gap-1 mb-4"><MapPin size={12} /> Tier 2 College • Ahmedabad</p>
+              <p className="text-xs text-zinc-500 flex items-center gap-1 mb-4"><MapPin size={12} /> Non-elite College • Ahmedabad</p>
               
               <div className="bg-zinc-950/60 p-3 rounded-xl border border-zinc-800/50 mb-6">
                 <p className="text-xs font-bold text-indigo-400 mb-2 flex items-center gap-1">

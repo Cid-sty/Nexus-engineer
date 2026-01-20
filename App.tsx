@@ -104,7 +104,7 @@ const App: React.FC = () => {
             <div className="flex items-center gap-3 bg-zinc-900/50 px-3 py-1.5 rounded-xl border border-zinc-800">
               <div className="text-right">
                 <p className="text-xs font-bold text-white">{user.name}</p>
-                <p className="text-[10px] text-zinc-500">Tier 2 Student</p>
+                <p className="text-[10px] text-zinc-500">Non-elite College Student</p>
               </div>
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
                 {user.name[0]}
