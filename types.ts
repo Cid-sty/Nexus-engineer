@@ -4,6 +4,8 @@ export interface Skill {
   level: number; // 0-100
 }
 
+export type EngineerRole = 'Frontend' | 'Backend' | 'UI/UX' | 'Lead/Pitch' | 'DevOps';
+
 export interface UserProfile {
   name: string;
   college: string;
@@ -13,6 +15,8 @@ export interface UserProfile {
   learningStyle: 'Project-based' | 'Theoretical' | 'Collaborative';
   primaryGoal: string;
   skills: Skill[];
+  skillsToLearn: string[];
+  preferredRole: EngineerRole;
   points: number;
   streak: number;
   location: string;
@@ -21,9 +25,10 @@ export interface UserProfile {
 export interface TeamMember {
   id: string;
   name: string;
-  role: string;
+  role: EngineerRole;
   skills: string[];
   mindsetScore: number;
+  activityScore: number; // 0-100 for rebalancing logic
 }
 
 export interface Squad {
@@ -33,6 +38,7 @@ export interface Squad {
   members: TeamMember[];
   activityLevel: number; // 0-100
   goal: string;
+  isHealthy: boolean;
 }
 
 export interface Achievement {

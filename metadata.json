@@ -3,6 +3,7 @@
   "description": "A focused platform for engineering students from non-elite colleges to find serious peers, build hackathon squads, and track technical growth via AI-driven mindset matching.",
   "requestFramePermissions": [
     "camera",
-    "microphone"
+    "microphone",
+    "geolocation"
   ]
 }
