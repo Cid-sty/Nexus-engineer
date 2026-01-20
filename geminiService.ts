@@ -2,13 +2,18 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile } from "./types";
 
 const cleanJsonResponse = (text: string) => {
-  return text.replace(/```json/g, '').replace(/```/g, '').trim();
+  // More robust cleaning for AI-generated JSON
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+  }
+  return cleaned.trim();
 };
 
 export const getAIRecommendation = async (user: UserProfile) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Profile: ${user.name}, Skills: ${user.skills.map(s => s.name).join(', ')}, Goal: ${user.primaryGoal}. 
-  Suggest: 1. Next skill, 2. Hackathon theme, 3. Encouragement, 4. Internship tip. JSON.`;
+  Suggest: 1. Next skill, 2. Hackathon theme, 3. Encouragement, 4. Internship tip. JSON format.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -32,10 +37,10 @@ export const getAIRecommendation = async (user: UserProfile) => {
   } catch (error) {
     console.error("AI Recommendation failed:", error);
     return { 
-      nextSkill: "System Design Essentials", 
+      nextSkill: "Advanced System Design", 
       hackathonTheme: "FinTech Innovation", 
-      encouragement: "The grind never stops. Your discipline is your edge.", 
-      internshipTip: "Contribute to a high-traffic repo to prove scale competence." 
+      encouragement: "Stay focused. Consistency is your greatest technical asset.", 
+      internshipTip: "Contribute to open-source to showcase real-world impact." 
     };
   }
 };
@@ -45,12 +50,8 @@ export const generateUserRoadmap = async (user: UserProfile) => {
   const currentSkills = user.skills.map(s => `${s.name} (${s.level}%)`).join(', ');
   const targetSkills = user.skillsToLearn.join(', ');
   
-  const prompt = `Generate a 4-stage industrial roadmap for an engineer knowing [${currentSkills}] wanting to learn [${targetSkills}].
-  Stage 1: Consolidation of current core.
-  Stage 2: Bridging to industrial tooling.
-  Stage 3: Mastery of target technologies.
-  Stage 4: Senior Architect integration.
-  Return a JSON array of RoadmapNode.`;
+  const prompt = `Generate a 4-stage technical roadmap for an engineer with skills [${currentSkills}] and goals [${targetSkills}].
+  Each node should focus on industrial standards. Return a JSON array of RoadmapNode.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -66,7 +67,7 @@ export const generateUserRoadmap = async (user: UserProfile) => {
               id: { type: Type.STRING },
               title: { type: Type.STRING },
               subtitle: { type: Type.STRING },
-              status: { type: Type.STRING, description: 'completed, current, or locked' },
+              status: { type: Type.STRING },
               description: { type: Type.STRING },
               subModules: {
                 type: Type.ARRAY,
@@ -82,14 +83,15 @@ export const generateUserRoadmap = async (user: UserProfile) => {
               bossProject: { type: Type.STRING },
               interviewFocus: { type: Type.STRING },
               nexusTip: { type: Type.STRING },
-              category: { type: Type.STRING, description: 'frontend, backend, systems, or cloud' }
+              category: { type: Type.STRING }
             },
             required: ["id", "title", "subtitle", "status", "description", "subModules", "bossProject", "interviewFocus", "nexusTip"]
           }
         }
       }
     });
-    return JSON.parse(cleanJsonResponse(response.text || '[]'));
+    const parsed = JSON.parse(cleanJsonResponse(response.text || '[]'));
+    return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
     console.error("Roadmap generation failed:", error);
     return [];
@@ -98,8 +100,7 @@ export const generateUserRoadmap = async (user: UserProfile) => {
 
 export const suggestSquads = async (user: UserProfile) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Form a high-synergy 4-person team including ${user.name} (Role: ${user.preferredRole}). 
-  Roles must be Backend, Frontend, UI/UX, and Lead/Pitch. JSON.`;
+  const prompt = `Suggest a 4-person team including ${user.name} for a major hackathon. JSON format.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -132,7 +133,7 @@ export const suggestSquads = async (user: UserProfile) => {
 
 export const findNearbyPeers = async (lat: number, lng: number, skills: string[]) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Find 3 serious engineering students within 5km of (${lat}, ${lng}). High commitment only. JSON.`;
+  const prompt = `Identify 3 technical peers near (${lat}, ${lng}) interested in ${skills.join(', ')}. JSON format.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -159,14 +160,14 @@ export const findNearbyPeers = async (lat: number, lng: number, skills: string[]
     });
     return JSON.parse(cleanJsonResponse(response.text || '[]'));
   } catch (error) {
-    console.error("Nearby peers search failed:", error);
+    console.error("Peer search failed:", error);
     return [];
   }
 };
 
 export const rebalanceSquadMember = async (squadName: string, missingRole: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Find replacement for ${missingRole} in "${squadName}". JSON.`;
+  const prompt = `Find a high-performance replacement for a ${missingRole} in the squad "${squadName}". JSON.`;
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -197,13 +198,13 @@ export const getChatResponse = async (history: any[], message: string) => {
   const chat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: "You are Nexus AI. Strictly focused on high-performance engineering growth for Tier-2/3 college students. Provide concrete technical advice, skip generic fluff. Be a demanding but helpful coach."
+      systemInstruction: "You are Nexus AI, a technical growth coach for engineering students. You provide concise, industrial-grade technical advice and roadmap guidance. Focus on high-performance engineering habits."
     }
   });
   try {
     const response = await chat.sendMessage({ message });
-    return response.text || "Connection lost.";
+    return response.text || "I'm experiencing a brief synchronization delay. Please restate your query.";
   } catch (e) {
-    return "The Nexus neural link is currently unstable. Please retry.";
+    return "Neural link unstable. Please retry in a moment.";
   }
 };

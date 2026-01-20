@@ -55,22 +55,27 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     const loadRoadmap = async () => {
       setLoading(true);
       try {
         const dynamicRoadmap = await generateUserRoadmap(user);
-        if (dynamicRoadmap && dynamicRoadmap.length > 0) {
-          setRoadmap(dynamicRoadmap);
-          const currentNode = dynamicRoadmap.find(n => n.status === 'current') || dynamicRoadmap[0];
+        if (mounted && dynamicRoadmap && dynamicRoadmap.length > 0) {
+          setRoadmap(dynamicRoadmap as RoadmapNode[]);
+          const currentNode = dynamicRoadmap.find((n: any) => n.status === 'current') || dynamicRoadmap[0];
           setSelectedNodeId(currentNode.id);
+        } else if (mounted) {
+           // If roadmap fails, we should ideally show a friendly message
+           setRoadmap([]);
         }
       } catch (err) {
         console.error("Failed to load roadmap", err);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     loadRoadmap();
+    return () => { mounted = false; };
   }, [user]);
 
   const selectedNode = roadmap.find(n => n.id === selectedNodeId);
@@ -85,9 +90,24 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
           </div>
         </div>
         <div className="text-center">
-          <h3 className="text-xl font-bold text-white">Synthesizing Nexus Roadmap</h3>
-          <p className="text-zinc-500 mt-2">Mapping {user.skills.length} existing competencies to Tier-1 industrial standards...</p>
+          <h3 className="text-xl font-bold text-white uppercase tracking-tight">Synthesizing Nexus Roadmap</h3>
+          <p className="text-zinc-500 mt-2">Correlating {user.skills.length} existing skills with target trajectories...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (roadmap.length === 0) {
+    return (
+      <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] p-12 text-center">
+        <div className="w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <ShieldAlert className="text-zinc-500" size={32} />
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2">Roadmap Synthesis Failed</h3>
+        <p className="text-zinc-500 max-w-sm mx-auto">The Nexus neural link was interrupted. Please refresh the dashboard to regenerate your technical path.</p>
+        <button onClick={() => window.location.reload()} className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold transition-all">
+          Retry Connection
+        </button>
       </div>
     );
   }
@@ -99,19 +119,19 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-600/5 rounded-full blur-[100px] group-hover:bg-indigo-600/10 transition-all duration-1000"></div>
         <div className="space-y-2 relative z-10">
           <div className="flex items-center gap-3">
-             <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">Personalized Growth Path</div>
+             <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">Growth Blueprint</div>
              <h2 className="text-4xl font-black text-white tracking-tighter uppercase">The Nexus Path</h2>
           </div>
           <p className="text-zinc-500 max-w-xl font-medium leading-relaxed">
-            Targeted trajectory for <span className="text-white font-bold">{user.name}</span>. 
-            Bridging <span className="text-zinc-300 font-bold">{user.skills[0]?.name || 'Core'}</span> mastery toward <span className="text-indigo-400 font-bold">{user.skillsToLearn[0] || 'Elite'}</span> competence.
+            Personalized trajectory for <span className="text-white font-bold">{user.name}</span>. 
+            Transforming <span className="text-zinc-300 font-bold">{user.skills[0]?.name || 'Core'}</span> fundamentals into <span className="text-indigo-400 font-bold">{user.skillsToLearn[0] || 'Senior'}</span> expertise.
           </p>
         </div>
         
         <div className="flex items-center gap-6 relative z-10">
           <div className="text-right">
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Target Discipline</p>
-            <p className="text-xl font-bold text-white italic">{user.preferredRole} Engineer</p>
+            <p className="text-xl font-bold text-white italic">{user.preferredRole} Engineering</p>
           </div>
           <div className="w-16 h-16 rounded-2xl bg-indigo-600/10 border-2 border-indigo-500/30 flex items-center justify-center text-indigo-400 font-black text-xl shadow-xl shadow-indigo-500/5">
             {roadmap.filter(n => n.status === 'completed').length}/{roadmap.length}
@@ -129,7 +149,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
               const isActive = selectedNodeId === node.id;
               const isCompleted = node.status === 'completed';
               const isLocked = node.status === 'locked';
-              const avgProgress = node.subModules.reduce((acc, curr) => acc + curr.progress, 0) / node.subModules.length;
+              const avgProgress = node.subModules.reduce((acc, curr) => acc + curr.progress, 0) / (node.subModules.length || 1);
 
               return (
                 <div 
@@ -187,7 +207,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
                     <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
                     <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Node Specification</p>
                   </div>
-                  <h3 className="text-4xl font-black text-white">{selectedNode.title}</h3>
+                  <h3 className="text-4xl font-black text-white leading-tight">{selectedNode.title}</h3>
                 </div>
                 <div className="p-4 bg-zinc-900/50 rounded-3xl border border-zinc-800 shadow-inner">
                   {getCategoryIcon(selectedNode.category)}
@@ -245,7 +265,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
                     <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
                         <Terminal size={18} className="text-indigo-400" />
                     </div>
-                    <p className="text-xs text-zinc-500 font-medium">
+                    <p className="text-xs text-zinc-500 font-medium leading-relaxed">
                       <span className="text-indigo-400 font-bold">Nexus Tip:</span> {selectedNode.nexusTip}
                     </p>
                   </div>
@@ -256,7 +276,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
             <div className="h-full flex items-center justify-center border-2 border-dashed border-zinc-800 rounded-[3rem] p-20 text-center">
               <div>
                 <Circle size={48} className="text-zinc-800 mx-auto mb-4" />
-                <p className="text-zinc-600 font-bold uppercase tracking-widest">Select an active node to inspect</p>
+                <p className="text-zinc-600 font-bold uppercase tracking-widest">Select an active node to inspect blueprints</p>
               </div>
             </div>
           )}
@@ -271,9 +291,9 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
         <div>
           <h4 className="text-2xl font-black text-white mb-3 tracking-tight italic">"The Industrial Advantage"</h4>
           <p className="text-zinc-500 leading-relaxed font-medium">
-            This roadmap is generated dynamically using Nexus Intelligence. It prioritizes <span className="text-indigo-400 font-bold">industrial reliability</span> over simple syntax mastery. 
-            By following these milestones, you eliminate the pedigree gap through sheer technical competence. 
-            Keep the drift high.
+            This roadmap is synthesized using high-fidelity industrial data. Unlike academic curriculums, Nexus Path prioritizes <span className="text-indigo-400 font-bold">production reliability</span> and <span className="text-zinc-300">architectural clarity</span>. 
+            By clearing these nodes, you build a portfolio that naturally eliminates the institutional pedigree gap. 
+            Consistency is the only unlock.
           </p>
         </div>
       </div>
