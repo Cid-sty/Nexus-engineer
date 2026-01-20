@@ -1,10 +1,9 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { UserProfile, Squad } from "./types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+import { UserProfile } from "./types";
 
 export const getAIRecommendation = async (user: UserProfile) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Based on this engineering student profile:
   Name: ${user.name}
   College Tier: 2/3
@@ -41,51 +40,17 @@ export const getAIRecommendation = async (user: UserProfile) => {
     return JSON.parse(response.text || '{}');
   } catch (error) {
     console.error("Gemini Error:", error);
-    return null;
+    return {
+      nextSkill: "Advanced System Design",
+      hackathonTheme: "AI for Social Good",
+      encouragement: "Stay consistent, your growth is measurable.",
+      internshipTip: "Focus on your GitHub portfolio projects."
+    };
   }
 };
 
-export const getDeploymentRoadmap = async (squad: Squad) => {
-  const prompt = `Squad Project: ${squad.name}
-  Current Version: ${squad.version || 'v0.1.0'}
-  Goal: ${squad.goal}
-  Type: ${squad.type}
-  
-  Suggest a versioning roadmap (v1.0.0, v1.1.0, v2.0.0) with specific technical milestones for each.
-  Focus on production-readiness for a student project.
-  Return JSON object with field "milestones" as an array of { version: string, features: string[] }.`;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            milestones: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  version: { type: Type.STRING },
-                  features: { type: Type.ARRAY, items: { type: Type.STRING } }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-    return JSON.parse(response.text || '{ "milestones": [] }');
-  } catch (error) {
-    console.error("Gemini Roadmap Error:", error);
-    return { milestones: [] };
-  }
-};
-
-export const getChatResponse = async (history: { role: string, parts: { text: string }[] }[], message: string) => {
+export const getChatResponse = async (history: any[], message: string) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const chat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
@@ -98,11 +63,12 @@ export const getChatResponse = async (history: { role: string, parts: { text: st
 };
 
 export const suggestSquads = async (user: UserProfile) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Form 3 hypothetical high-compatibility teammates for ${user.name} for a major engineering hackathon.
   User Skills: ${user.skills.map(s => s.name).join(', ')}
   Goal: ${user.primaryGoal}
   
-  Explain WHY each teammate is a good mindset match (e.g., 'shares same 25hr/week commitment').
+  Explain WHY each teammate is a good mindset match.
   Return JSON array of objects with fields: name, role, matchingReason, skills.`;
 
   try {

@@ -33,9 +33,6 @@ export interface Squad {
   members: TeamMember[];
   activityLevel: number; // 0-100
   goal: string;
-  version?: string;
-  deploymentStatus?: 'Local' | 'Staging' | 'Production';
-  lastDeployed?: string;
 }
 
 export interface Achievement {
@@ -46,4 +43,4 @@ export interface Achievement {
   points: number;
 }
 
-export type ViewType = 'dashboard' | 'squads' | 'learning' | 'analytics' | 'rewards' | 'ai-companion' | 'deployments';
+export type ViewType = 'dashboard' | 'squads' | 'learning' | 'analytics' | 'rewards' | 'ai-companion';

@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { UserProfile, Achievement } from '../types';
+import { UserProfile } from '../types';
 import { getAIRecommendation } from '../geminiService';
-import { Zap, Flame, Target, Star, ChevronRight, BrainCircuit, ExternalLink } from 'lucide-react';
+import { Zap, Flame, Target, Star, ChevronRight, BrainCircuit } from 'lucide-react';
 
 interface DashboardProps {
   user: UserProfile;
@@ -13,17 +13,24 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     const loadRec = async () => {
-      const rec = await getAIRecommendation(user);
-      setRecommendation(rec);
-      setLoading(false);
+      try {
+        const rec = await getAIRecommendation(user);
+        if (mounted) {
+          setRecommendation(rec);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (mounted) setLoading(false);
+      }
     };
     loadRec();
+    return () => { mounted = false; };
   }, [user]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-white">Welcome back, {user.name.split(' ')[0]}</h2>
@@ -48,9 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Growth Feed */}
         <div className="lg:col-span-2 space-y-6">
-          {/* AI Companion Card */}
           <div className="bg-gradient-to-br from-indigo-900/40 via-zinc-900 to-zinc-950 border border-indigo-500/20 rounded-2xl p-6 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                <BrainCircuit size={120} />
@@ -86,7 +91,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             </div>
           </div>
 
-          {/* Activity Placeholder */}
           <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold flex items-center gap-2"><Target size={20} className="text-indigo-400" /> Active Goals</h3>
@@ -112,7 +116,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
         </div>
 
-        {/* Sidebar Widgets */}
         <div className="space-y-6">
           <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Zap size={20} className="text-yellow-500" /> Quick Tasks</h3>

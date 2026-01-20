@@ -1,9 +1,7 @@
 
 import React from 'react';
-import { LayoutDashboard, Users, BookOpen, BarChart3, Trophy, MessageSquareCode, Rocket } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, BarChart3, Trophy, MessageSquareCode } from 'lucide-react';
 import { UserProfile, Squad, Achievement, ViewType } from './types';
-
-export const APP_VERSION = "v1.2.4-stable";
 
 export const INITIAL_USER: UserProfile = {
   name: "Arjun Sharma",
@@ -35,10 +33,7 @@ export const MOCK_SQUADS: Squad[] = [
       { id: '3', name: 'Rohan K.', role: 'Design', skills: ['Figma', 'UI/UX'], mindsetScore: 92 }
     ],
     activityLevel: 88,
-    goal: "Win 'Solve for Tomorrow' Hackathon",
-    version: "v0.9.1",
-    deploymentStatus: "Staging",
-    lastDeployed: "2023-10-22"
+    goal: "Win 'Solve for Tomorrow' Hackathon"
   },
   {
     id: 'squad-2',
@@ -49,10 +44,7 @@ export const MOCK_SQUADS: Squad[] = [
       { id: '4', name: 'Priya M.', role: 'Lead', skills: ['C++', 'Algorithms'], mindsetScore: 99 }
     ],
     activityLevel: 94,
-    goal: "Master Dynamic Programming",
-    version: "v1.0.0",
-    deploymentStatus: "Production",
-    lastDeployed: "2023-10-18"
+    goal: "Master Dynamic Programming"
   }
 ];
 
@@ -65,7 +57,6 @@ export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { id: 'ai-companion', label: 'AI Growth Companion', icon: <MessageSquareCode size={20} /> },
   { id: 'squads', label: 'My Squads', icon: <Users size={20} /> },
-  { id: 'deployments', label: 'Deployments', icon: <Rocket size={20} /> },
   { id: 'learning', label: 'Learning Path', icon: <BookOpen size={20} /> },
   { id: 'analytics', label: 'Growth Analytics', icon: <BarChart3 size={20} /> },
   { id: 'rewards', label: 'Rewards Hub', icon: <Trophy size={20} /> },
