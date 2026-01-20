@@ -5,34 +5,10 @@ import AICompanion from './components/AICompanion';
 import SquadBuilder from './components/SquadBuilder';
 import RewardsHub from './components/RewardsHub';
 import GrowthAnalytics from './components/GrowthAnalytics';
+import LearningPath from './components/LearningPath';
 import { INITIAL_USER } from './constants';
 import { ViewType } from './types';
-import { Search, Bell, Settings, BookCheck, ShieldCheck } from 'lucide-react';
-
-const LearningPathPlaceholder = () => (
-  <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-    <div className="flex justify-between items-center">
-      <h2 className="text-3xl font-bold text-white flex items-center gap-3">Learning Path <BookCheck className="text-indigo-400" /></h2>
-      <span className="text-zinc-500 text-sm">Target: Senior Engineer Role</span>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {['Core Fundamentals', 'Project Specialization', 'System Design'].map((stage, i) => (
-        <div key={stage} className="bg-zinc-900/40 border border-zinc-800 p-6 rounded-2xl">
-          <div className="text-xs font-bold text-indigo-400 mb-2 uppercase tracking-widest">Stage 0{i+1}</div>
-          <h3 className="text-lg font-bold text-white mb-4">{stage}</h3>
-          <div className="space-y-3">
-            {[1, 2, 3].map(item => (
-              <div key={item} className="flex items-center gap-3 text-sm text-zinc-400">
-                <ShieldCheck size={14} className={i === 0 ? "text-green-500" : "text-zinc-700"} />
-                <span>Advanced Module {item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+import { Search, Bell, Settings } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentView, setView] = useState<ViewType>('dashboard');
@@ -49,7 +25,7 @@ const App: React.FC = () => {
       case 'rewards':
         return <RewardsHub user={user} />;
       case 'learning':
-        return <LearningPathPlaceholder />;
+        return <LearningPath user={user} />;
       case 'analytics':
         return <GrowthAnalytics user={user} />;
       default:
