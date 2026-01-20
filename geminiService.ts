@@ -2,11 +2,10 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile } from "./types";
 
 const cleanJsonResponse = (text: string) => {
-  // More robust cleaning for AI-generated JSON
+  if (!text) return "";
   let cleaned = text.trim();
-  if (cleaned.startsWith('```')) {
-    cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-  }
+  // Remove markdown code blocks if present
+  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
   return cleaned.trim();
 };
 
@@ -37,10 +36,10 @@ export const getAIRecommendation = async (user: UserProfile) => {
   } catch (error) {
     console.error("AI Recommendation failed:", error);
     return { 
-      nextSkill: "Advanced System Design", 
-      hackathonTheme: "FinTech Innovation", 
-      encouragement: "Stay focused. Consistency is your greatest technical asset.", 
-      internshipTip: "Contribute to open-source to showcase real-world impact." 
+      nextSkill: "System Design Fundamentals", 
+      hackathonTheme: "AI for Local Governance", 
+      encouragement: "Stay consistent. Your commitment is your only true competitive advantage.", 
+      internshipTip: "Build one public-facing project that solves a real business problem." 
     };
   }
 };
@@ -50,8 +49,10 @@ export const generateUserRoadmap = async (user: UserProfile) => {
   const currentSkills = user.skills.map(s => `${s.name} (${s.level}%)`).join(', ');
   const targetSkills = user.skillsToLearn.join(', ');
   
-  const prompt = `Generate a 4-stage technical roadmap for an engineer with skills [${currentSkills}] and goals [${targetSkills}].
-  Each node should focus on industrial standards. Return a JSON array of RoadmapNode.`;
+  const prompt = `Generate a 4-stage technical roadmap for a college student. 
+  Focus on: Programming Languages, Industrial Stacks (MERN, Cloud, etc), and a Step-by-Step Learning Path.
+  User current skills: [${currentSkills}]. Goals: [${targetSkills}].
+  Return exactly 4 stages as a JSON array.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -67,7 +68,7 @@ export const generateUserRoadmap = async (user: UserProfile) => {
               id: { type: Type.STRING },
               title: { type: Type.STRING },
               subtitle: { type: Type.STRING },
-              status: { type: Type.STRING },
+              status: { type: Type.STRING, description: "completed, current, or locked" },
               description: { type: Type.STRING },
               subModules: {
                 type: Type.ARRAY,
@@ -83,24 +84,88 @@ export const generateUserRoadmap = async (user: UserProfile) => {
               bossProject: { type: Type.STRING },
               interviewFocus: { type: Type.STRING },
               nexusTip: { type: Type.STRING },
-              category: { type: Type.STRING }
+              category: { type: Type.STRING, description: "frontend, backend, systems, or cloud" }
             },
             required: ["id", "title", "subtitle", "status", "description", "subModules", "bossProject", "interviewFocus", "nexusTip"]
           }
         }
       }
     });
-    const parsed = JSON.parse(cleanJsonResponse(response.text || '[]'));
-    return Array.isArray(parsed) ? parsed : [];
+    const result = JSON.parse(cleanJsonResponse(response.text || '[]'));
+    return Array.isArray(result) && result.length > 0 ? result : getFallbackRoadmap(user);
   } catch (error) {
-    console.error("Roadmap generation failed:", error);
-    return [];
+    console.error("Roadmap generation failed, using fallback:", error);
+    return getFallbackRoadmap(user);
   }
 };
 
+// Robust fallback in case AI fails or times out
+const getFallbackRoadmap = (user: UserProfile) => [
+  {
+    id: "stage-1",
+    title: "Language Mastery",
+    subtitle: "Deep-diving into Core Logic",
+    status: "completed",
+    description: "Strengthening the foundations of Programming with TypeScript and Data Structures.",
+    subModules: [
+      { name: "Advanced ES6+", progress: 100 },
+      { name: "Async Control Flow", progress: 90 }
+    ],
+    bossProject: "Real-time Event Bus System",
+    interviewFocus: "Memory Management & Execution Context",
+    nexusTip: "Pedigree doesn't matter when your code is more optimized than theirs.",
+    category: "systems"
+  },
+  {
+    id: "stage-2",
+    title: "Industrial Tech Stack",
+    subtitle: "Full-Stack Architecture",
+    status: "current",
+    description: "Building production-grade applications using modern frameworks like React and Node.js.",
+    subModules: [
+      { name: "React Design Patterns", progress: 40 },
+      { name: "Database Schema Optimization", progress: 20 }
+    ],
+    bossProject: "Multi-tenant SaaS Boilerplate",
+    interviewFocus: "Scalable State Management",
+    nexusTip: "Tier-1 companies hire for architecture, not just syntax.",
+    category: "frontend"
+  },
+  {
+    id: "stage-3",
+    title: "Cloud & Deployment",
+    subtitle: "Reliable Infrastructure",
+    status: "locked",
+    description: "Learning the art of deploying and scaling applications to millions of users.",
+    subModules: [
+      { name: "Docker Containerization", progress: 0 },
+      { name: "CI/CD Pipelines", progress: 0 }
+    ],
+    bossProject: "Auto-scaling Video Streamer",
+    interviewFocus: "High Availability Systems",
+    nexusTip: "The best code is the code that is monitored and reliable.",
+    category: "cloud"
+  },
+  {
+    id: "stage-4",
+    title: "Senior Integration",
+    subtitle: "The Elite Drift",
+    status: "locked",
+    description: "Synthesizing all skills to become a high-impact individual contributor.",
+    subModules: [
+      { name: "System Design for Scale", progress: 0 },
+      { name: "Microservices Bridge", progress: 0 }
+    ],
+    bossProject: "Distributed Ledger System",
+    interviewFocus: "CAP Theorem & Trade-off Analysis",
+    nexusTip: "Consistency is your greatest competitive edge in a Tier-2 environment.",
+    category: "backend"
+  }
+];
+
 export const suggestSquads = async (user: UserProfile) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Suggest a 4-person team including ${user.name} for a major hackathon. JSON format.`;
+  const prompt = `Suggest a 4-person high-synergy team including ${user.name}. JSON format.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -133,7 +198,7 @@ export const suggestSquads = async (user: UserProfile) => {
 
 export const findNearbyPeers = async (lat: number, lng: number, skills: string[]) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Identify 3 technical peers near (${lat}, ${lng}) interested in ${skills.join(', ')}. JSON format.`;
+  const prompt = `Find 3 local engineering peers near (${lat}, ${lng}). JSON format.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -198,13 +263,13 @@ export const getChatResponse = async (history: any[], message: string) => {
   const chat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: "You are Nexus AI, a technical growth coach for engineering students. You provide concise, industrial-grade technical advice and roadmap guidance. Focus on high-performance engineering habits."
+      systemInstruction: "You are Nexus AI, a highly technical coach for college students aiming for elite software roles. Be direct, technical, and encouraging."
     }
   });
   try {
     const response = await chat.sendMessage({ message });
-    return response.text || "I'm experiencing a brief synchronization delay. Please restate your query.";
+    return response.text || "I'm recalibrating. Please repeat.";
   } catch (e) {
-    return "Neural link unstable. Please retry in a moment.";
+    return "Neural link unstable. Retry shortly.";
   }
 };

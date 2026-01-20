@@ -60,16 +60,17 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
       setLoading(true);
       try {
         const dynamicRoadmap = await generateUserRoadmap(user);
-        if (mounted && dynamicRoadmap && dynamicRoadmap.length > 0) {
-          setRoadmap(dynamicRoadmap as RoadmapNode[]);
-          const currentNode = dynamicRoadmap.find((n: any) => n.status === 'current') || dynamicRoadmap[0];
-          setSelectedNodeId(currentNode.id);
-        } else if (mounted) {
-           // If roadmap fails, we should ideally show a friendly message
-           setRoadmap([]);
+        if (mounted) {
+          if (dynamicRoadmap && dynamicRoadmap.length > 0) {
+            setRoadmap(dynamicRoadmap as RoadmapNode[]);
+            const currentNode = dynamicRoadmap.find((n: any) => n.status === 'current') || dynamicRoadmap[0];
+            setSelectedNodeId(currentNode.id);
+          } else {
+            setRoadmap([]);
+          }
         }
       } catch (err) {
-        console.error("Failed to load roadmap", err);
+        console.error("Critical error loading roadmap", err);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -91,22 +92,23 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
         <div className="text-center">
           <h3 className="text-xl font-bold text-white uppercase tracking-tight">Synthesizing Nexus Roadmap</h3>
-          <p className="text-zinc-500 mt-2">Correlating {user.skills.length} existing skills with target trajectories...</p>
+          <p className="text-zinc-500 mt-2">Correlating industrial stacks with your technical profile...</p>
         </div>
       </div>
     );
   }
 
+  // This check is now less likely to trigger due to fallbacks in geminiService
   if (roadmap.length === 0) {
     return (
       <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] p-12 text-center">
         <div className="w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <ShieldAlert className="text-zinc-500" size={32} />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">Roadmap Synthesis Failed</h3>
-        <p className="text-zinc-500 max-w-sm mx-auto">The Nexus neural link was interrupted. Please refresh the dashboard to regenerate your technical path.</p>
+        <h3 className="text-xl font-bold text-white mb-2">Neural Link Timeout</h3>
+        <p className="text-zinc-500 max-w-sm mx-auto">The AI synthesis engine is currently overloaded. Please refresh to attempt connection again.</p>
         <button onClick={() => window.location.reload()} className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold transition-all">
-          Retry Connection
+          Retry Synthesis
         </button>
       </div>
     );
@@ -119,19 +121,19 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-600/5 rounded-full blur-[100px] group-hover:bg-indigo-600/10 transition-all duration-1000"></div>
         <div className="space-y-2 relative z-10">
           <div className="flex items-center gap-3">
-             <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">Growth Blueprint</div>
+             <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest">Personalized Strategy</div>
              <h2 className="text-4xl font-black text-white tracking-tighter uppercase">The Nexus Path</h2>
           </div>
           <p className="text-zinc-500 max-w-xl font-medium leading-relaxed">
-            Personalized trajectory for <span className="text-white font-bold">{user.name}</span>. 
-            Transforming <span className="text-zinc-300 font-bold">{user.skills[0]?.name || 'Core'}</span> fundamentals into <span className="text-indigo-400 font-bold">{user.skillsToLearn[0] || 'Senior'}</span> expertise.
+            Industrial trajectory for <span className="text-white font-bold">{user.name}</span>. 
+            Bridging <span className="text-zinc-300 font-bold">{user.skills[0]?.name || 'Core'}</span> fundamentals toward <span className="text-indigo-400 font-bold">Industrial Stack</span> mastery.
           </p>
         </div>
         
         <div className="flex items-center gap-6 relative z-10">
           <div className="text-right">
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Target Discipline</p>
-            <p className="text-xl font-bold text-white italic">{user.preferredRole} Engineering</p>
+            <p className="text-xl font-bold text-white italic">{user.preferredRole} Architect</p>
           </div>
           <div className="w-16 h-16 rounded-2xl bg-indigo-600/10 border-2 border-indigo-500/30 flex items-center justify-center text-indigo-400 font-black text-xl shadow-xl shadow-indigo-500/5">
             {roadmap.filter(n => n.status === 'completed').length}/{roadmap.length}
@@ -205,7 +207,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Node Specification</p>
+                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Industrial Specs</p>
                   </div>
                   <h3 className="text-4xl font-black text-white leading-tight">{selectedNode.title}</h3>
                 </div>
@@ -258,7 +260,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
 
                 <div className="pt-6 flex flex-col gap-4">
                   <button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-3xl flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1 shadow-2xl shadow-indigo-500/20">
-                    ACCESS DRILL ENVIRONMENT <ChevronRight size={20} />
+                    OPEN WORKSPACE <ChevronRight size={20} />
                   </button>
                   
                   <div className="p-5 bg-zinc-900/40 rounded-[2rem] border border-zinc-800/50 flex items-center gap-4">
@@ -266,7 +268,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
                         <Terminal size={18} className="text-indigo-400" />
                     </div>
                     <p className="text-xs text-zinc-500 font-medium leading-relaxed">
-                      <span className="text-indigo-400 font-bold">Nexus Tip:</span> {selectedNode.nexusTip}
+                      <span className="text-indigo-400 font-bold">Nexus Intelligence:</span> {selectedNode.nexusTip}
                     </p>
                   </div>
                 </div>
@@ -276,7 +278,7 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
             <div className="h-full flex items-center justify-center border-2 border-dashed border-zinc-800 rounded-[3rem] p-20 text-center">
               <div>
                 <Circle size={48} className="text-zinc-800 mx-auto mb-4" />
-                <p className="text-zinc-600 font-bold uppercase tracking-widest">Select an active node to inspect blueprints</p>
+                <p className="text-zinc-600 font-bold uppercase tracking-widest">Select an active node for blueprint access</p>
               </div>
             </div>
           )}
@@ -289,11 +291,11 @@ const LearningPath: React.FC<{ user: UserProfile }> = ({ user }) => {
           <BrainCircuit className="text-indigo-400" size={40} />
         </div>
         <div>
-          <h4 className="text-2xl font-black text-white mb-3 tracking-tight italic">"The Industrial Advantage"</h4>
+          <h4 className="text-2xl font-black text-white mb-3 tracking-tight italic">"Eliminating the Pedigree Gap"</h4>
           <p className="text-zinc-500 leading-relaxed font-medium">
-            This roadmap is synthesized using high-fidelity industrial data. Unlike academic curriculums, Nexus Path prioritizes <span className="text-indigo-400 font-bold">production reliability</span> and <span className="text-zinc-300">architectural clarity</span>. 
-            By clearing these nodes, you build a portfolio that naturally eliminates the institutional pedigree gap. 
-            Consistency is the only unlock.
+            Nexus Paths are optimized for Tier-2/3 reality. We focus on <span className="text-indigo-400 font-bold">Open Source dominance</span> and <span className="text-zinc-300">architectural competence</span>. 
+            When your code speaks for itself, the name of your college becomes irrelevant. 
+            Stay the course.
           </p>
         </div>
       </div>
