@@ -10,7 +10,7 @@ const cleanJsonResponse = (text: string) => {
 };
 
 export const getAIRecommendation = async (user: UserProfile) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const prompt = `Profile: ${user.name}, Skills: ${user.skills.map(s => s.name).join(', ')}, Goal: ${user.primaryGoal}. 
   Suggest: 1. Next skill, 2. Hackathon theme, 3. Encouragement, 4. Internship tip. JSON format.`;
 
@@ -45,7 +45,7 @@ export const getAIRecommendation = async (user: UserProfile) => {
 };
 
 export const generateUserRoadmap = async (user: UserProfile) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const currentSkills = user.skills.map(s => `${s.name} (${s.level}%)`).join(', ');
   const targetSkills = user.skillsToLearn.join(', ');
   
@@ -100,7 +100,7 @@ export const generateUserRoadmap = async (user: UserProfile) => {
 };
 
 // Robust fallback in case AI fails or times out
-const getFallbackRoadmap = (user: UserProfile) => [
+export const getFallbackRoadmap = (user: UserProfile) => [
   {
     id: "stage-1",
     title: "Language Mastery",
@@ -164,7 +164,7 @@ const getFallbackRoadmap = (user: UserProfile) => [
 ];
 
 export const suggestSquads = async (user: UserProfile) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const prompt = `Suggest a 4-person high-synergy team including ${user.name}. JSON format.`;
 
   try {
@@ -192,12 +192,16 @@ export const suggestSquads = async (user: UserProfile) => {
     return JSON.parse(cleanJsonResponse(response.text || '[]'));
   } catch (error) {
     console.error("Squad suggestion failed:", error);
-    return [];
+    return [
+      { name: "Sneha Patel", role: "Backend Engineer", matchingReason: "Expert in Go and Distributed Systems. Matches your Node.js background for a robust full-stack duo.", skills: ["Go", "Docker", "PostgreSQL"], location: "Ahmedabad, Gujarat" },
+      { name: "Rohan Mehta", role: "UI/UX Designer", matchingReason: "High-fidelity prototyping specialist. Can translate your React components into a polished product.", skills: ["Figma", "Design Systems"], location: "Gandhinagar, Gujarat" },
+      { name: "Priya Singh", role: "DevOps/Cloud", matchingReason: "AWS Certified. Complements your goal of learning Kubernetes and Cloud infrastructure.", skills: ["AWS", "Kubernetes", "Terraform"], location: "Remote / Vadodara" }
+    ];
   }
 };
 
 export const findNearbyPeers = async (lat: number, lng: number, skills: string[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const prompt = `Find 3 local engineering peers near (${lat}, ${lng}). JSON format.`;
 
   try {
@@ -226,12 +230,16 @@ export const findNearbyPeers = async (lat: number, lng: number, skills: string[]
     return JSON.parse(cleanJsonResponse(response.text || '[]'));
   } catch (error) {
     console.error("Peer search failed:", error);
-    return [];
+    return [
+      { name: "Ishaan K.", role: "Frontend", distance: "0.8km", focusArea: "React/Next.js", seriousnessScore: 94, lastActive: "2h ago" },
+      { name: "Meera V.", role: "Backend", distance: "1.2km", focusArea: "Python/Django", seriousnessScore: 89, lastActive: "5h ago" },
+      { name: "Karan R.", role: "Full Stack", distance: "2.5km", focusArea: "MERN Stack", seriousnessScore: 92, lastActive: "10m ago" }
+    ];
   }
 };
 
 export const rebalanceSquadMember = async (squadName: string, missingRole: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const prompt = `Find a high-performance replacement for a ${missingRole} in the squad "${squadName}". JSON.`;
   try {
     const response = await ai.models.generateContent({
@@ -259,7 +267,7 @@ export const rebalanceSquadMember = async (squadName: string, missingRole: strin
 };
 
 export const getChatResponse = async (history: any[], message: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const chat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {

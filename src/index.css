@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: var(--accent-color);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-primary: var(--border-primary);
+}
+
+:root {
+  --accent-color: #6366f1; /* Indigo */
+  --bg-primary: #070708;
+  --bg-secondary: #0a0a0b;
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --border-primary: rgba(255, 255, 255, 0.03);
+}
+
+:root.light {
+  --accent-color: #10b981; /* Emerald/Green */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --border-primary: rgba(0, 0, 0, 0.03);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Glassmorphism */
+.glass {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-primary);
+}
+
+.glass-hover:hover {
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-color);
+  opacity: 0.9;
+}
+
+/* Background Glow */
+.bg-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% -20%, var(--accent-color), transparent 70%),
+              radial-gradient(circle at 0% 100%, var(--accent-color), transparent 50%);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 10px;
+  opacity: 0.5;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+@keyframes scan-radar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-scan-radar {
+  animation: scan-radar 4s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float { animation: float 6s ease-in-out infinite; }
+
+/* Roadmap Grids */
+.blueprint-grid {
+  background-size: 30px 30px;
+  background-image: linear-gradient(to right, var(--border-primary) 1px, transparent 1px),
+                    linear-gradient(to bottom, var(--border-primary) 1px, transparent 1px);
+}
+
+/* Markdown Styling */
+.markdown-body h1 { @apply text-2xl font-black mb-4; }
+.markdown-body h2 { @apply text-xl font-black mb-3; }
+.markdown-body h3 { @apply text-lg font-black mb-2; }
+.markdown-body p { @apply mb-4 leading-relaxed; }
+.markdown-body ul { @apply list-disc list-inside mb-4 space-y-1; }
+.markdown-body ol { @apply list-decimal list-inside mb-4 space-y-1; }
+.markdown-body code { @apply bg-bg-primary px-1.5 py-0.5 rounded font-mono text-xs border border-border-primary; }
+.markdown-body pre { @apply bg-bg-primary p-4 rounded-xl border border-border-primary mb-4 overflow-x-auto; }
+.markdown-body pre code { @apply bg-transparent border-none p-0; }
+.markdown-body blockquote { @apply border-l-4 border-accent pl-4 italic mb-4 text-text-secondary; }
+.markdown-body strong { @apply font-black text-accent; }
