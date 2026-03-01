@@ -6,6 +6,8 @@ export interface Skill {
 
 export type EngineerRole = 'Frontend' | 'Backend' | 'UI/UX' | 'Lead/Pitch' | 'DevOps';
 
+export type StatusTier = 'Bronze' | 'Silver' | 'Gold' | 'Elite';
+
 export interface UserProfile {
   name: string;
   college: string;
@@ -17,9 +19,16 @@ export interface UserProfile {
   skills: Skill[];
   skillsToLearn: string[];
   preferredRole: EngineerRole;
-  points: number;
+  merit: number; // XP
+  credits: number; // Spendable NC
+  tier: StatusTier;
   streak: number;
+  lastCheckIn?: string;
   location: string;
+  isOnboarded: boolean;
+  goals?: string[];
+  commitment?: string;
+  style?: string;
 }
 
 export interface TeamMember {
@@ -46,7 +55,25 @@ export interface Achievement {
   title: string;
   description: string;
   date: string;
-  points: number;
+  merit: number;
 }
 
-export type ViewType = 'dashboard' | 'squads' | 'learning' | 'analytics' | 'rewards' | 'ai-companion';
+export interface RewardActivity {
+  id: string;
+  label: string;
+  merit: number;
+  credits: number;
+  icon: string;
+  description: string;
+  limit?: string;
+}
+
+export interface RedemptionOption {
+  id: string;
+  label: string;
+  cost: number;
+  description: string;
+  type: 'discount' | 'unlock' | 'mentorship';
+}
+
+export type ViewType = 'dashboard' | 'squads' | 'learning' | 'analytics' | 'rewards' | 'ai-companion' | 'mentorship' | 'profile';

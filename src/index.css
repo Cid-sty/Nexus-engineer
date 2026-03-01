@@ -7,32 +7,34 @@
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-border-primary: var(--border-primary);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 :root {
-  --accent-color: #6366f1; /* Indigo */
-  --bg-primary: #070708;
-  --bg-secondary: #0a0a0b;
-  --text-primary: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --border-primary: rgba(255, 255, 255, 0.03);
+  --accent-color: #007AFF; /* Apple Blue */
+  --bg-primary: #F5F5F7; /* Apple Light Gray */
+  --bg-secondary: #FFFFFF;
+  --text-primary: #1D1D1F; /* Apple Black */
+  --text-secondary: #86868B; /* Apple Gray */
+  --border-primary: rgba(0, 0, 0, 0.08);
 }
 
-:root.light {
-  --accent-color: #10b981; /* Emerald/Green */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --border-primary: rgba(0, 0, 0, 0.03);
+:root.dark {
+  --accent-color: #0A84FF; /* Apple Dark Blue */
+  --bg-primary: #000000;
+  --bg-secondary: #1C1C1E;
+  --text-primary: #F5F5F7;
+  --text-secondary: #86868B;
+  --border-primary: rgba(255, 255, 255, 0.1);
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
 }
 
 .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -81,6 +83,24 @@ body {
 }
 .animate-scan-radar {
   animation: scan-radar 4s linear infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: 200%;
 }
 
 @keyframes float {

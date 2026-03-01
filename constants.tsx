@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, Users, BookOpen, BarChart3, Trophy, MessageSquareCode } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, BarChart3, Trophy, MessageSquareCode, Sparkles } from 'lucide-react';
 import { UserProfile, Squad, Achievement } from './types';
 
 export const INITIAL_USER: UserProfile = {
@@ -18,10 +18,35 @@ export const INITIAL_USER: UserProfile = {
   ],
   skillsToLearn: ['System Design', 'Kubernetes', 'Go'],
   preferredRole: 'Frontend',
-  points: 1250,
+  merit: 1250,
+  credits: 450,
+  tier: 'Silver',
   streak: 14,
-  location: "Gandhinagar, Gujarat"
+  location: "Gandhinagar, Gujarat",
+  isOnboarded: false
 };
+
+export const REWARD_ACTIVITIES = [
+  { id: 'checkin', label: 'Daily Check-in', merit: 10, credits: 2, description: 'Log your daily progress with proof.', limit: '1/day' },
+  { id: 'streak', label: '7-Day Streak', merit: 50, credits: 10, description: 'Maintain consistency for a full week.', limit: 'Weekly' },
+  { id: 'hackathon', label: 'Hackathon Participation', merit: 100, credits: 20, description: 'Join a verified hackathon event.', limit: 'Per event' },
+  { id: 'win', label: 'Hackathon Win', merit: 500, credits: 100, description: 'Secure a podium finish.', limit: 'Per win' },
+  { id: 'internship', label: 'Internship Application', merit: 20, credits: 5, description: 'Apply via verified Nexus links.', limit: '3/day' },
+  { id: 'contribution', label: 'Circle Contribution', merit: 30, credits: 10, description: 'High-value peer contribution.', limit: 'Peer-voted' },
+];
+
+export const REDEMPTION_OPTIONS = [
+  { id: 'discount', label: '20% Premium Discount', cost: 500, description: 'Get 20% off your next month of Nexus Premium.', type: 'discount' },
+  { id: 'autobuilder', label: 'Auto-Builder Access', cost: 200, description: '24-hour access to the elite squad synthesis engine.', type: 'unlock' },
+  { id: 'mentorship', label: 'Mentorship Credit', cost: 1000, description: '₹50 off your next 1:1 mentorship session.', type: 'mentorship' },
+];
+
+export const STATUS_TIERS = [
+  { name: 'Bronze', minXP: 0, color: 'text-stone-400', perk: 'Basic access' },
+  { name: 'Silver', minXP: 1001, color: 'text-zinc-300', perk: 'Rising Talent Badge' },
+  { name: 'Gold', minXP: 5001, color: 'text-amber-400', perk: 'Priority Squad Matching' },
+  { name: 'Elite', minXP: 15001, color: 'text-indigo-400', perk: 'Nexus Verified Status' },
+];
 
 export const MOCK_SQUADS: Squad[] = [
   {
@@ -52,8 +77,8 @@ export const MOCK_SQUADS: Squad[] = [
 ];
 
 export const MOCK_ACHIEVEMENTS: Achievement[] = [
-  { id: 'a1', title: '7 Day Streak', description: 'Maintained consistency for a week.', date: '2023-10-20', points: 100 },
-  { id: 'a2', title: 'Code Warrior', description: 'Participated in first Hackathon.', date: '2023-10-15', points: 500 }
+  { id: 'a1', title: '7 Day Streak', description: 'Maintained consistency for a week.', date: '2023-10-20', merit: 100 },
+  { id: 'a2', title: 'Code Warrior', description: 'Participated in first Hackathon.', date: '2023-10-15', merit: 500 }
 ];
 
 export const NAV_ITEMS = [
@@ -61,6 +86,7 @@ export const NAV_ITEMS = [
   { id: 'ai-companion', label: 'AI Growth Companion', icon: <MessageSquareCode size={20} /> },
   { id: 'squads', label: 'Squad Builder', icon: <Users size={20} /> },
   { id: 'learning', label: 'Learning Path', icon: <BookOpen size={20} /> },
+  { id: 'mentorship', label: 'Mentorship', icon: <Sparkles size={20} /> },
   { id: 'analytics', label: 'Growth Analytics', icon: <BarChart3 size={20} /> },
   { id: 'rewards', label: 'Rewards Hub', icon: <Trophy size={20} /> },
 ];

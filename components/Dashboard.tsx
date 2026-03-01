@@ -5,17 +5,38 @@ import { getAIRecommendation } from '../geminiService';
 import { 
   Zap, Flame, Target, Star, ChevronRight, BrainCircuit, 
   Rocket, ShieldCheck, MapPin, Activity, Award, 
-  TrendingUp, Clock
+  TrendingUp, Clock, Coins, Medal, CheckCircle2, Loader2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardProps {
   user: UserProfile;
+  onUpdateUser: (updates: Partial<UserProfile>) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, onUpdateUser }) => {
   const [recommendation, setRecommendation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+
+  const hasCheckedInToday = user.lastCheckIn === new Date().toISOString().split('T')[0];
+
+  const handleCheckIn = () => {
+    if (hasCheckedInToday) return;
+    setIsCheckingIn(true);
+    
+    // Simulate PoW verification
+    setTimeout(() => {
+      onUpdateUser({
+        merit: user.merit + 10,
+        credits: user.credits + 2,
+        lastCheckIn: new Date().toISOString().split('T')[0],
+        streak: user.streak + 1
+      });
+      setIsCheckingIn(false);
+      alert("Daily Check-in Verified! +10 XP, +2 NC. Streak extended!");
+    }, 1500);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -76,11 +97,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
               <p className="text-lg font-bold text-text-primary leading-none">{user.streak} Days</p>
             </div>
           </div>
-          <div className="glass px-5 py-3 rounded-2xl flex items-center gap-3 border-l-2 border-l-yellow-500/50">
-            <Star className="text-yellow-500" size={20} />
+          <div className="glass px-5 py-3 rounded-2xl flex items-center gap-3 border-l-2 border-l-accent/50">
+            <Medal className="text-accent" size={20} />
             <div>
-              <p className="text-[10px] text-text-secondary uppercase font-black tracking-widest">Nexus Rank</p>
-              <p className="text-lg font-bold text-text-primary leading-none">#{Math.floor(user.points / 100)}</p>
+              <p className="text-[10px] text-text-secondary uppercase font-black tracking-widest">Merit Score</p>
+              <p className="text-lg font-bold text-text-primary leading-none">{user.merit.toLocaleString()} XP</p>
+            </div>
+          </div>
+          <div className="glass px-5 py-3 rounded-2xl flex items-center gap-3 border-l-2 border-l-emerald-500/50">
+            <Coins className="text-emerald-500" size={20} />
+            <div>
+              <p className="text-[10px] text-text-secondary uppercase font-black tracking-widest">Nexus Credits</p>
+              <p className="text-lg font-bold text-text-primary leading-none">{user.credits.toLocaleString()} NC</p>
             </div>
           </div>
         </div>
@@ -89,6 +117,38 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6">
         
+        {/* Daily Check-in Card */}
+        <motion.div variants={item} className="md:col-span-6 lg:col-span-4 glass rounded-[2.5rem] p-8 border border-border-primary relative overflow-hidden group">
+          <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all"></div>
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-6">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${hasCheckedInToday ? 'bg-emerald-500/10 text-emerald-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                {hasCheckedInToday ? <CheckCircle2 size={24} /> : <Flame size={24} />}
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">Daily Status</p>
+                <p className={`text-sm font-black ${hasCheckedInToday ? 'text-emerald-500' : 'text-orange-500'}`}>
+                  {hasCheckedInToday ? 'VERIFIED' : 'PENDING'}
+                </p>
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-text-primary mb-2 tracking-tighter uppercase">Daily Proof of Work</h3>
+            <p className="text-sm text-text-secondary mb-8 font-medium leading-relaxed">Log your industrial progress today to maintain your streak and earn NC.</p>
+            <button 
+              onClick={handleCheckIn}
+              disabled={hasCheckedInToday || isCheckingIn}
+              className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                hasCheckedInToday 
+                  ? 'bg-bg-primary text-emerald-500 border border-emerald-500/20 cursor-default' 
+                  : 'bg-accent text-white shadow-xl shadow-accent/20 hover:scale-[1.02] active:scale-[0.98]'
+              }`}
+            >
+              {isCheckingIn ? <Loader2 className="animate-spin" size={18} /> : hasCheckedInToday ? <CheckCircle2 size={18} /> : <Zap size={18} />}
+              {isCheckingIn ? 'Verifying...' : hasCheckedInToday ? 'Checked In' : 'Log Progress'}
+            </button>
+          </div>
+        </motion.div>
+
         {/* Main AI Agent Card */}
         <motion.div variants={item} className="md:col-span-6 lg:col-span-8 glass rounded-[2.5rem] p-8 relative overflow-hidden group border border-accent/10 hover:border-accent/30 transition-all duration-500">
           <div className="absolute -right-16 -top-16 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity rotate-12 group-hover:rotate-0 duration-700 text-accent">
@@ -213,17 +273,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-          display: flex;
-          width: 200%;
-        }
-      `}} />
     </motion.div>
   );
 };

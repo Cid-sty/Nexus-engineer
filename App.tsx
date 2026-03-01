@@ -6,14 +6,14 @@ import SquadBuilder from './components/SquadBuilder';
 import RewardsHub from './components/RewardsHub';
 import GrowthAnalytics from './components/GrowthAnalytics';
 import LearningPath from './components/LearningPath';
-import { INITIAL_USER } from './constants';
-import { ViewType } from './types';
+import { INITIAL_USER, REWARD_ACTIVITIES } from './constants';
+import { ViewType, UserProfile } from './types';
 import { Search, Bell, Settings, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const App: React.FC = () => {
   const [currentView, setView] = useState<ViewType>('dashboard');
-  const [user] = useState(INITIAL_USER);
+  const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     return saved ? saved === 'dark' : true;
@@ -21,27 +21,31 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isDark) {
-      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
-      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
   }, [isDark]);
 
   const toggleTheme = () => setIsDark(!isDark);
 
+  const handleUpdateUser = (updates: Partial<UserProfile>) => {
+    setUser(prev => ({ ...prev, ...updates }));
+  };
+
   const renderView = () => {
     const viewContent = (() => {
       switch (currentView) {
         case 'dashboard':
-          return <Dashboard user={user} />;
+          return <Dashboard user={user} onUpdateUser={handleUpdateUser} />;
         case 'ai-companion':
           return <AICompanion user={user} />;
         case 'squads':
           return <SquadBuilder user={user} />;
         case 'rewards':
-          return <RewardsHub user={user} />;
+          return <RewardsHub user={user} onUpdateUser={handleUpdateUser} />;
         case 'learning':
           return <LearningPath user={user} />;
         case 'analytics':
@@ -124,15 +128,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
-        }
-      `}} />
     </div>
   );
 };

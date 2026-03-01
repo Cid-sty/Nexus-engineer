@@ -192,7 +192,7 @@ const SquadBuilder: React.FC<SquadBuilderProps> = ({ user }) => {
             <div className="relative z-10">
               <div className="relative w-48 h-48 mx-auto mb-10">
                 <div className={`absolute inset-0 rounded-full border-2 border-accent/20 ${scanning ? 'animate-ping' : ''}`}></div>
-                <div className={`absolute inset-0 rounded-full border-t-2 border-accent ${scanning ? 'animate-spin-radar' : 'opacity-20'}`}></div>
+                <div className={`absolute inset-0 rounded-full border-t-2 border-accent ${scanning ? 'animate-scan-radar' : 'opacity-20'}`}></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Radar size={64} className={`${scanning ? 'text-accent' : 'text-text-secondary/30'}`} />
                 </div>
